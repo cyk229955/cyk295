@@ -1,0 +1,151 @@
+package Test;
+
+import java.awt.*; 
+
+import javax.swing.*;
+
+import java.awt.event.*; 
+import java.sql.*; 
+  
+@SuppressWarnings("serial") 
+public class BookInfo extends JFrame implements ActionListener{ 
+
+ private JLabel inputLabel; 
+ private JTextField inputText; 
+ private JButton searchBut; 
+  
+ private JTable bookTable; 
+ private JScrollPane bookScroll; 
+ private JButton addBut; 
+ private JButton modifyBut; 
+ private JButton deleteBut; 
+ private JButton refreshBut; 
+ private JButton setBgcolor;
+ private BookTableModel bookTableModel; 
+ JColorChooser ch = new JColorChooser();
+ JDialog colorDialog = JColorChooser.createDialog(this, "选取颜色", true, ch, null,
+			null);
+ public static void main(String[] args) throws SQLException { 
+ // TODO Auto-generated method stub 
+ 
+ } 
+ public BookInfo() throws SQLException{ 
+
+ inputLabel=new JLabel("请输入书名:"); 
+ inputText=new JTextField(10); 
+ searchBut=new JButton("查询"); 
+ bookTableModel=new BookTableModel(); 
+  
+ bookTable=new JTable(bookTableModel); 
+ bookScroll=new JScrollPane(bookTable); 
+ 
+  
+ addBut=new JButton("添加"); 
+ modifyBut=new JButton("修改"); 
+ deleteBut=new JButton("删除"); 
+ refreshBut=new JButton("刷新"); 
+ setBgcolor=new JButton("选择背景颜色");
+ searchBut.addActionListener(this); 
+ addBut.addActionListener(this); 
+ refreshBut.addActionListener(this); 
+ modifyBut.addActionListener(this); 
+ deleteBut.addActionListener(this); 
+ setBgcolor.addActionListener(this);
+  
+ } 
+  
+ void setMinWindowLayout(){ 
+	 
+ setTitle("个人图书收藏夹管理系统");
+ Container con1=new Container(); 
+ con1.setLayout(new FlowLayout()); 
+ con1.add(inputLabel); 
+ con1.add(inputText); 
+ con1.add(searchBut); 
+ con1.add(refreshBut); 
+ con1.add(setBgcolor); 
+ Container con2=new Container(); 
+ con2.setLayout(new FlowLayout()); 
+ con2.add(addBut); 
+ con2.add(modifyBut); 
+ con2.add(deleteBut); 
+ this.setLayout(new BorderLayout()); 
+ this.add(con1,BorderLayout.NORTH); 
+ this.add(bookScroll,BorderLayout.CENTER); 
+ this.add(con2,BorderLayout.SOUTH); 
+ this.validate(); 
+ } 
+ 
+ @Override
+ public void actionPerformed(ActionEvent e) { 
+if(e.getSource()==setBgcolor){
+	colorDialog.setVisible(true);
+	bookTable.setBackground(ch.getColor());
+}
+ if(e.getSource()==searchBut){ 
+ if(!this.inputText.getText().equals("")){ 
+ String bookName=this.inputText.getText(); 
+ String sql="SELECT * FROM book_info WHERE book_name ='"+bookName+"'"; 
+ try { 
+ bookTableModel=new BookTableModel(sql); 
+ bookTable.setModel(bookTableModel); 
+ } catch (SQLException e1) { 
+ e1.printStackTrace(); 
+ } 
+   
+ }else{ 
+ JOptionPane.showMessageDialog(this,"输入不能为空!", "提示",JOptionPane.WARNING_MESSAGE); 
+ } 
+ } 
+ else if(e.getSource()==addBut){ 
+ @SuppressWarnings("unused") 
+ AddBookDialog addWin=new AddBookDialog(this,"添加图书",true); 
+ this.refreshTable(); 
+ } 
+ else if(e.getSource()==refreshBut){ 
+ this.refreshTable(); 
+ } 
+ else if(e.getSource()==deleteBut){ 
+ int rowNum=bookTable.getSelectedRow(); 
+ if(rowNum<0||rowNum>bookTable.getRowCount()){ 
+ JOptionPane.showMessageDialog(this,"未选中！", "提示",JOptionPane.WARNING_MESSAGE); 
+ } 
+ else{ 
+	 
+ int n = JOptionPane.showConfirmDialog(null, "确认删除吗?", "提示", JOptionPane.YES_NO_OPTION); 
+ if (n == JOptionPane.YES_OPTION) { 
+  String bookNum=(String) bookTable.getValueAt(rowNum, 0); 
+  String sql="DELETE FROM book_info WHERE book_num= '"+bookNum+"'"; 
+  bookTableModel.deleteBook(sql); 
+  this.refreshTable(); 
+  JOptionPane.showMessageDialog(this,"删除成功！", "提示",JOptionPane.INFORMATION_MESSAGE); 
+ } else if (n == JOptionPane.NO_OPTION) { 
+  return; 
+ } 
+ } 
+ } 
+ else if(e.getSource()==modifyBut){ 
+ bookTable.setModel(bookTableModel); 
+ int rowNum=bookTable.getSelectedRow(); 
+ if(rowNum<0||rowNum>bookTable.getRowCount()){ 
+ JOptionPane.showMessageDialog(this,"未选中！", "提示",JOptionPane.INFORMATION_MESSAGE); 
+ } 
+ else{ 
+ @SuppressWarnings("unused") 
+ ModifyBook modifyWin=new ModifyBook(this,"修改信息",true,bookTableModel,rowNum); 
+ this.refreshTable(); 
+ } 
+ } 
+  
+ } 
+ public void refreshTable(){ 
+ BookTableModel searchBook; 
+ try { 
+ searchBook = new BookTableModel("SELECT * FROM book_info"); 
+ bookTable.setModel(searchBook); 
+ bookTableModel=searchBook; 
+ } catch (SQLException e1) { 
+ e1.printStackTrace(); 
+ } 
+ } 
+}
