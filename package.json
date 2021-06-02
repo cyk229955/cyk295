@@ -1,0 +1,23 @@
+{
+  "name": "mistx-backend-utilities",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alchemistcoin/mistx-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alchemistcoin/mistx-backend/issues"
+  },
+  "homepage": "https://github.com/alchemistcoin/mistx-backend#readme",
+  "dependencies": {
+    "node-redis": "^0.1.7",
+    "socket.io-client": "^4.1.2"
+  },
+  "devDependencies": {}
+}
